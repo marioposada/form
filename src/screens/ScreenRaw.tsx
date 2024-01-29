@@ -12,6 +12,7 @@ import {
   Platform,
   KeyboardAvoidingView,
   Alert,
+  Text,
 } from 'react-native';
 import useList from '../hooks/useList';
 import EditServices from '../services/edit-service';
@@ -19,13 +20,6 @@ import EditServices from '../services/edit-service';
 const User = () => {
   const [searchApi, results] = useList();
   const [formData, setFormData] = useState({
-    transaction_max_amount: 0,
-    transaction_max_amount_alert_message: 0,
-    invoice_upload_limit: 0,
-    elasticsearch_location_radius: 0,
-    mercadopago_public_key: '',
-    minimum_app_version_suggested: '',
-    minimum_app_version_supported: '',
     corporate_enabled: false,
     appa_club_enabled: false,
     gift_enabled: false,
@@ -33,7 +27,32 @@ const User = () => {
     payment_methods_enabled: false,
     turn_off_register_validations: false,
     additional_benefits_enabled: false,
+    transaction_max_amount: 0,
+    transaction_max_amount_alert_message: 0,
+    invoice_upload_limit: 0,
+    elasticsearch_location_radius: 0,
+    mercadopago_public_key: '',
+    minimum_app_version_suggested: '',
+    minimum_app_version_supported: '',
   });
+
+  const propertyLabels = {
+    corporate_enabled: 'Corporate Enabled',
+    appa_club_enabled: 'Appa Club Enabled',
+    gift_enabled: 'Gift Enabled',
+    parking_enabled: 'Parking Enabled',
+    payment_methods_enabled: 'Payment Methods Enabled',
+    turn_off_register_validations: 'Turn Off Register Validations',
+    additional_benefits_enabled: 'Additional Benefits Enabled',
+    transaction_max_amount: 'Transaction Max Amount',
+    transaction_max_amount_alert_message:
+      'Transaction Max Amount Alert Message',
+    invoice_upload_limit: 'Invoice Upload Limit',
+    elasticsearch_location_radius: 'Elasticsearch Location Radius',
+    mercadopago_public_key: 'Mercadopago Public Key',
+    minimum_app_version_suggested: 'Minimum App Version Suggested',
+    minimum_app_version_supported: 'Minimum App Version Supported',
+  };
 
   useEffect(() => {
     searchApi();
@@ -81,13 +100,14 @@ const User = () => {
 
   const onSubmit = async () => {
     try {
+      console.log('Data para endPoint', formData);
       await EditServices.updateData(formData);
       Alert.alert('Cambios enviados correctamente');
     } catch (error) {
       Alert.alert('Error al enviar los cambios');
     }
   };
-
+  console.log(formData);
   return (
     <ScrollView
       contentContainerStyle={styles.mainContainer}
@@ -102,19 +122,23 @@ const User = () => {
               {Object.keys(formData).map((field, index) => {
                 if (typeof formData[field] === 'boolean') {
                   return (
-                    <Switch
-                      key={`switch-${index}`}
-                      value={formData[field]}
-                      onValueChange={val => handleSwitchChange(field, val)}
-                    />
+                    <View key={`switch-${index}`}>
+                      <Switch
+                        value={formData[field]}
+                        onValueChange={val => handleSwitchChange(field, val)}
+                      />
+                      <Text>{propertyLabels[field]}</Text>
+                    </View>
                   );
                 } else {
                   return (
-                    <TextInput
-                      key={`input-${index}`}
-                      value={formData[field].toString()}
-                      onChangeText={val => handleInputChange(field, val)}
-                    />
+                    <View>
+                      <TextInput
+                        key={`input-${index}`}
+                        value={formData[field].toString()}
+                        onChangeText={val => handleInputChange(field, val)}
+                      />
+                    </View>
                   );
                 }
               })}
